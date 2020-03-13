@@ -31,3 +31,29 @@ export function createHorizontalLine () {
 	hLine.appendChild(document.createTextNode('.'))
 	return hLine
 }
+
+export function recalculateActive (terminalsSet, active) {
+	const terminals = [...terminalsSet]
+	terminals.sort((a, b) => {
+		// active before other
+		if (active && a === active) {
+			return -1
+		}
+		if (active && b === active) {
+			return 1
+		}
+		// visible before hidden
+		if (a.isVisible() && !b.isVisible()) {
+			return -1
+		}
+		if (!a.isVisible() && b.isVisible()) {
+			return 1
+		}
+		// lower activeIndex before higher activeIndex
+		return a.activeIndex - b.activeIndex
+	})
+	terminals.forEach((t, i) => {
+		t.activeIndex = i
+		t.emitter.emit('did-change-title')
+	})
+}
