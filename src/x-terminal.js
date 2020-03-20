@@ -124,6 +124,7 @@ class XTerminalSingleton {
 					if (isXTerminalModel(item)) {
 						item.setNewPane(pane)
 					}
+					recalculateActive(this.terminals_set)
 				}))
 				recalculateActive(this.terminals_set)
 			}),
@@ -295,7 +296,7 @@ class XTerminalSingleton {
 
 	getActiveTerminal () {
 		const terminals = [...this.terminals_set]
-		return terminals.find(t => t.activeIndex === 0 && t.isVisible())
+		return terminals.find(t => t.isActiveTerminal())
 	}
 
 	insertSelection () {

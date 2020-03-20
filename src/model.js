@@ -127,7 +127,7 @@ class XTerminalModel {
 	}
 
 	getTitle () {
-		return (this.activeIndex === 0 && this.isVisible() ? '* ' : '') + this.title
+		return (this.isActiveTerminal() ? '* ' : '') + this.title
 		// return this.activeIndex + '|' + this.title
 	}
 
@@ -234,13 +234,15 @@ class XTerminalModel {
 	}
 
 	setActive () {
-		if (this.isVisible()) {
-			recalculateActive(this.terminals_set, this)
-		}
+		recalculateActive(this.terminals_set, this)
 	}
 
 	isVisible () {
 		return this.pane && this.pane.getActiveItem() === this && (!this.dock || this.dock.isVisible())
+	}
+
+	isActiveTerminal () {
+		return this.activeIndex === 0 && this.isVisible()
 	}
 
 	setNewPane (pane) {
