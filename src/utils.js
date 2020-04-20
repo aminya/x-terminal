@@ -33,6 +33,7 @@ export function createHorizontalLine () {
 }
 
 export function recalculateActive (terminalsSet, active) {
+	const allowHidden = atom.config.get('x-terminal.terminalSettings.allowHiddenToStayActive')
 	const terminals = [...terminalsSet]
 	terminals.sort((a, b) => {
 		// active before other
@@ -42,12 +43,14 @@ export function recalculateActive (terminalsSet, active) {
 		if (active && b === active) {
 			return 1
 		}
-		// visible before hidden
-		if (a.isVisible() && !b.isVisible()) {
-			return -1
-		}
-		if (!a.isVisible() && b.isVisible()) {
-			return 1
+		if (!allowHidden) {
+			// visible before hidden
+			if (a.isVisible() && !b.isVisible()) {
+				return -1
+			}
+			if (!a.isVisible() && b.isVisible()) {
+				return 1
+			}
 		}
 		// lower activeIndex before higher activeIndex
 		return a.activeIndex - b.activeIndex
