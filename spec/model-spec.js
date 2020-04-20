@@ -472,17 +472,81 @@ describe('XTerminalModel', () => {
 		expect(this.model.element.ptyProcess.write.calls.allArgs()).toEqual([[expectedText]])
 	})
 
-	it('setNewPane(event)', async () => {
+	it('setActive()', async function () {
+		const pane = atom.workspace.getCenter().getActivePane()
 		const uri = 'x-terminal://somesessionid/'
 		const terminalsSet = new Set()
-		const model = new XTerminalModel({
+		const model1 = new XTerminalModel({
 			uri: uri,
 			terminals_set: terminalsSet,
 		})
-		await model.initializedPromise
-		const expected = {}
-		model.setNewPane(expected)
-		expect(model.pane).toBe(expected)
+		await model1.initializedPromise
+		pane.addItem(model1)
+		model1.setNewPane(pane)
+		const model2 = new XTerminalModel({
+			uri: uri,
+			terminals_set: terminalsSet,
+		})
+		await model2.initializedPromise
+		pane.addItem(model2)
+		model2.setNewPane(pane)
+		expect(model1.activeIndex).toBe(0)
+		expect(model2.activeIndex).toBe(1)
+		model2.setActive()
+		expect(model1.activeIndex).toBe(1)
+		expect(model2.activeIndex).toBe(0)
+	})
+
+	describe('setNewPane', () => {
+		let model
+
+		beforeEach(async () => {
+			const uri = 'x-terminal://somesessionid/'
+			const terminalsSet = new Set()
+			model = new XTerminalModel({
+				uri: uri,
+				terminals_set: terminalsSet,
+			})
+			await model.initializedPromise
+		})
+
+		it('(mock)', async () => {
+			const expected = { getContainer: () => ({ getLocation: () => {} }) }
+			model.setNewPane(expected)
+			expect(model.pane).toBe(expected)
+			expect(model.dock).toBe(null)
+		})
+
+		it('(center)', async () => {
+			const pane = atom.workspace.getCenter().getActivePane()
+			model.setNewPane(pane)
+			expect(model.pane).toBe(pane)
+			expect(model.dock).toBe(null)
+		})
+
+		it('(left)', async () => {
+			const dock = atom.workspace.getLeftDock()
+			const pane = dock.getActivePane()
+			model.setNewPane(pane)
+			expect(model.pane).toBe(pane)
+			expect(model.dock).toBe(dock)
+		})
+
+		it('(right)', async () => {
+			const dock = atom.workspace.getRightDock()
+			const pane = dock.getActivePane()
+			model.setNewPane(pane)
+			expect(model.pane).toBe(pane)
+			expect(model.dock).toBe(dock)
+		})
+
+		it('(bottom)', async () => {
+			const dock = atom.workspace.getBottomDock()
+			const pane = dock.getActivePane()
+			model.setNewPane(pane)
+			expect(model.pane).toBe(pane)
+			expect(model.dock).toBe(dock)
+		})
 	})
 
 	it('toggleProfileMenu()', () => {
