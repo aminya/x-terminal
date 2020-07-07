@@ -27,9 +27,7 @@ jobs:
     - name: APM version
       run: apm -v
     - name: Install dependencies
-      run: |
-        apm install
-        npm run build
+      run: apm install
     - name: Run tests 👩🏾‍💻
       run: atom --test spec
 
